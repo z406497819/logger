@@ -2,6 +2,8 @@
 my file logger system
 
 ```go
+package main
+
 import (
 	"github.com/z406497819/logger"
 )

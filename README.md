@@ -3,15 +3,19 @@ my file logger system
 
 ```go
 import (
-	"tinky.golang.com/mongo_driver/conf"
+	"github.com/z406497819/logger"
 )
 
 var log logger.Logger
 
-log = logger.NewFileLogger("debug", "./log/")
+func main()
+{
+    log = logger.NewFileLogger("debug", "./log/")
+    
+    log.Info("hahahaha")
+    log.Debug("hahahaha")
+    log.Warning("hahahaha")
+    log.Error("hahahaha")
+}
 
-log.Info("hahahaha")
-log.Debug("hahahaha")
-log.Warning("hahahaha")
-log.Error("hahahaha")
 ```

@@ -51,6 +51,12 @@ func NewFileLogger(levelStr, path string) *FileLogger {
 }
 
 func (f *FileLogger) initFile() error {
+	err := os.MkdirAll(f.filePath, 0644)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
 	fullName := path.Join(f.filePath, f.fileName)
 	fileObj, err := os.OpenFile(fullName, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
 	if err != nil {

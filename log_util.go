@@ -14,63 +14,54 @@ type LogLevel uint16
 const (
 	UNKNOWN LogLevel = iota
 	DEBUG
-	TRACE
 	INFO
 	WARNING
 	ERROR
-	FATAL
 )
 
-type Logger interface {
-	Debug(format string, a ...interface{})
-	Info(format string, a ...interface{})
-	Warning(format string, a ...interface{})
-	Error(format string, a ...interface{})
-}
-
+// 将字符串转为对应日志级别LogLevel
 func parseLogLevel(s string) (LogLevel, error) {
 	switch strings.ToLower(s) {
 	case "debug":
 		return DEBUG, nil
-	case "trace":
-		return TRACE, nil
 	case "info":
 		return INFO, nil
 	case "warning":
 		return WARNING, nil
 	case "error":
 		return ERROR, nil
-	case "fatal":
-		return FATAL, nil
 	default:
-		err := errors.New("无效的日志级别")
+		err := errors.New("invalid log level")
 		return UNKNOWN, err
 	}
 }
 
+// 将日志级别LogLevel转为对应字符串
 func getLogString(level LogLevel) string {
 	switch level {
 	case DEBUG:
 		return "DEBUG"
-	case TRACE:
-		return "TRACE"
 	case INFO:
 		return "INFO"
 	case WARNING:
 		return "WARNING"
 	case ERROR:
 		return "ERROR"
-	case FATAL:
-		return "FATAL"
 	default:
 		return "DEBUG"
 	}
 }
 
+// 获取当前时间,Y-m-d H:i:s
 func getTime() string {
 	return time.Now().Format("2006-01-02 15:04:05")
 }
 
+// 获取当前执行位置信息
+// skip = 0 ,getInfo() log_const.go 63
+// skip = 1 ,(*FileLogger).logAsync() log_handle.go 178
+// skip = 2 ,(*FileLogger).Info() log_const.go 257
+// skip = 3 ,TestLogger() logger_test.go 9
 func getInfo(skip int) (funcName, fileName string, lineNo int) {
 	pc, file, line, ok := runtime.Caller(skip)
 	if !ok {

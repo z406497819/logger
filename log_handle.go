@@ -9,15 +9,13 @@ import (
 
 // FileLogger 主结构体
 type FileLogger struct {
-	Level         LogLevel
-	filePath      string
-	fileName      string
-	errorFileName string
-	maxFileSize   int64
-	fileObj       *os.File
-	errFileObj    *os.File
-	logChan       chan *logMsg
-	async         bool
+	Level       LogLevel
+	filePath    string
+	fileName    string
+	maxFileSize int64
+	fileObj     *os.File
+	logChan     chan *logMsg
+	async       bool
 }
 
 // 单条日志chan结构体
@@ -68,15 +66,8 @@ func (f *FileLogger) initFile() error {
 		return err
 	}
 
-	errFileObj, err := os.OpenFile(fullName+".err", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0644)
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	//2个日志变量赋值
+	//日志变量赋值
 	f.fileObj = fileObj
-	f.errFileObj = errFileObj
 
 	//设置5个消费者，监听logChan
 	for i := 0; i < 5; i++ {
@@ -89,7 +80,6 @@ func (f *FileLogger) initFile() error {
 // 关闭文件
 func (f *FileLogger) Close() {
 	f.fileObj.Close()
-	f.errFileObj.Close()
 }
 
 // 检查文件大小是否超出，超出则需要切割
@@ -150,25 +140,6 @@ func (f *FileLogger) log(lv LogLevel, format string, a ...interface{}) {
 			funcName,
 			lineNo,
 			fmt.Sprintf(format, a...))
-
-		//单独记录错误日志
-		if lv >= ERROR {
-			if f.checkSize(f.errFileObj) {
-				newFile, err := f.splitFile(f.errFileObj)
-				if err != nil {
-					return
-				}
-				f.errFileObj = newFile
-			}
-			fmt.Fprintf(f.errFileObj,
-				"[%s] [%s] [%s:%s:%d] %s\n",
-				getTime(),
-				getLogString(lv),
-				fileName,
-				funcName,
-				lineNo,
-				fmt.Sprintf(format, a...))
-		}
 	}
 }
 
@@ -213,25 +184,6 @@ func (f *FileLogger) asyncWriter() {
 				logTmp.funcName,
 				logTmp.line,
 				logTmp.msg)
-
-			//单独记录错误日志
-			if logTmp.level >= ERROR {
-				if f.checkSize(f.errFileObj) {
-					newFile, err := f.splitFile(f.errFileObj)
-					if err != nil {
-						return
-					}
-					f.errFileObj = newFile
-				}
-				fmt.Fprintf(f.errFileObj,
-					"[%s] [%s] [%s:%s:%d] %s\n",
-					logTmp.timestamp,
-					getLogString(logTmp.level),
-					logTmp.fileName,
-					logTmp.funcName,
-					logTmp.line,
-					logTmp.msg)
-			}
 		default:
 			//取不到日志先休息500ms，sleep会让出cpu，不会占用
 			time.Sleep(time.Millisecond * 500)

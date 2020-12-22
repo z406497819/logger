@@ -10,14 +10,11 @@ import (
 
 var log logger.Logger
 
-func main()
-{
-    log = logger.NewFileLogger("debug", "./log/", true)
-    
-    log.Info("hahahaha")
-    log.Debug("hahahaha")
-    log.Warning("hahahaha")
-    log.Error("hahahaha")
+func main() {
+	log = logger.NewFileLogger("debug", "./log/", false)
+	
+	log.Info("log message:%s","hello world")
 }
+
 
 ```

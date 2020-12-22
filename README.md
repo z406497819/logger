@@ -12,7 +12,7 @@ var log logger.Logger
 
 func main()
 {
-    log = logger.NewFileLogger("debug", "./log/")
+    log = logger.NewFileLogger("debug", "./log/", true)
     
     log.Info("hahahaha")
     log.Debug("hahahaha")

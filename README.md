@@ -1,5 +1,5 @@
 # logger
-my file logger system
+my file logger system.
 
 ```go
 package main

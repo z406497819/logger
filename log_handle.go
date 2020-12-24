@@ -9,13 +9,13 @@ import (
 
 // FileLogger 主结构体
 type FileLogger struct {
-	Level       LogLevel
-	filePath    string
-	fileName    string
-	maxFileSize int64
-	fileObj     *os.File
-	logChan     chan *logMsg
-	async       bool
+	Level       LogLevel     //日志级别  type LogLevel uint16类型
+	filePath    string       //日志路径
+	fileName    string       //日志文件名
+	maxFileSize int64        //最大内存
+	fileObj     *os.File     //文件指针
+	logChan     chan *logMsg //单条日志chan
+	async       bool         //是否异步
 }
 
 // 单条日志chan结构体
@@ -35,6 +35,7 @@ func NewFileLogger(levelStr, path string, async bool) *FileLogger {
 		panic(err)
 	}
 
+	//获得FileLogger结构体的指针
 	fl := &FileLogger{
 		Level:       logLevel,
 		filePath:    path,
@@ -43,6 +44,8 @@ func NewFileLogger(levelStr, path string, async bool) *FileLogger {
 		logChan:     make(chan *logMsg, 1000),
 		async:       async,
 	}
+
+	//初始化文件
 	err = fl.initFile()
 	if err != nil {
 		panic(err)
@@ -66,7 +69,7 @@ func (f *FileLogger) initFile() error {
 		return err
 	}
 
-	//日志变量赋值
+	//文件指针赋值
 	f.fileObj = fileObj
 
 	//设置5个消费者，监听logChan
@@ -75,11 +78,6 @@ func (f *FileLogger) initFile() error {
 	}
 
 	return nil
-}
-
-// 关闭文件
-func (f *FileLogger) Close() {
-	f.fileObj.Close()
 }
 
 // 检查文件大小是否超出，超出则需要切割
@@ -92,6 +90,7 @@ func (f *FileLogger) checkSize(file *os.File) bool {
 }
 
 // 切割文件
+// 实际就是建一个新的文件，将新的文件对象赋值给f.fileObj
 func (f *FileLogger) splitFile(file *os.File) (*os.File, error) {
 	//需要切割日志文件
 	nowStr := time.Now().Format("20060102150405")

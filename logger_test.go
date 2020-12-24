@@ -7,6 +7,8 @@ import (
 func TestLogger(t *testing.T) {
 	log := NewFileLogger("debug", "./log", true)
 	log.Info("info message %s", "i am hello world")
+	log.Debug("debug message")
+	log.Warning("warning message")
 	log.Error("error message")
 }
 

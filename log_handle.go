@@ -44,13 +44,11 @@ type Opt func(*FileLogger)
 
 func WithLevelStr(levelStr string) Opt {
 	return func(logger *FileLogger) {
-		fmt.Println(logger)
 		logLevel, err := parseLogLevel(levelStr)
 		if err != nil {
 			panic(err)
 		}
 		logger.Level = logLevel
-		fmt.Println(logger)
 	}
 }
 

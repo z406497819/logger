@@ -28,29 +28,71 @@ type logMsg struct {
 	line      int
 }
 
+var l *FileLogger
+
+func init() {
+	l = NewFileLogger()
+}
+
+func AddOption(opts ...Opt) {
+	for _, opt := range opts {
+		opt(l)
+	}
+}
+
+type Opt func(*FileLogger)
+
+func WithLevelStr(levelStr string) Opt {
+	return func(logger *FileLogger) {
+		fmt.Println(logger)
+		logLevel, err := parseLogLevel(levelStr)
+		if err != nil {
+			panic(err)
+		}
+		logger.Level = logLevel
+		fmt.Println(logger)
+	}
+}
+
+func WithPath(path string) Opt {
+	return func(logger *FileLogger) {
+		logger.filePath = path
+		err := logger.initFile()
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func WithAsync(async bool) Opt {
+	return func(logger *FileLogger) {
+		logger.async = async
+	}
+}
+
 // 构造函数
-func NewFileLogger(levelStr, path string, async bool) *FileLogger {
-	logLevel, err := parseLogLevel(levelStr)
+func NewFileLogger() *FileLogger {
+	logLevel, err := parseLogLevel("debug")
 	if err != nil {
 		panic(err)
 	}
 
 	//获得FileLogger结构体的指针
-	fl := &FileLogger{
+	l = &FileLogger{
 		Level:       logLevel,
-		filePath:    path,
+		filePath:    "./log",
 		fileName:    time.Now().Format("2006-01-02") + ".log",
 		maxFileSize: 1024 * 1024 * 10,
 		logChan:     make(chan *logMsg, 1000),
-		async:       async,
+		async:       false,
 	}
 
 	//初始化文件
-	err = fl.initFile()
+	err = l.initFile()
 	if err != nil {
 		panic(err)
 	}
-	return fl
+	return l
 }
 
 // 初始化本地文件
@@ -226,3 +268,5 @@ func (f *FileLogger) Error(format string, a ...interface{}) {
 		f.log(ERROR, format, a...)
 	}
 }
+
+func Info(format string, a ...interface{}) { l.Info(format, a...) }

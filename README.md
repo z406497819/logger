@@ -8,12 +8,12 @@ import (
 	"github.com/z406497819/logger"
 )
 
-var log logger.Logger
-
 func main() {
-	log = logger.NewFileLogger("debug", "./log/", false)
-	
-	log.Info("log message:%s","hello world")
+
+    // 如果需要额外配置，使用如下操作即可
+    // AddOption(WithLevelStr("debug"), WithPath("./log1"), WithAsync(true))
+    
+    Info("log message:%s", "hello world")
 }
 
 

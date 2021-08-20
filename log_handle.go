@@ -270,3 +270,9 @@ func (f *FileLogger) Error(format string, a ...interface{}) {
 }
 
 func Info(format string, a ...interface{}) { l.Info(format, a...) }
+
+func Debug(format string, a ...interface{}) { l.Debug(format, a...) }
+
+func Warning(format string, a ...interface{}) { l.Warning(format, a...) }
+
+func Error(format string, a ...interface{}) { l.Error(format, a...) }
